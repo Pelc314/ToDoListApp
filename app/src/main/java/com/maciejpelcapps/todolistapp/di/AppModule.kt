@@ -2,6 +2,8 @@ package com.maciejpelcapps.todolistapp.di
 
 import android.app.Application
 import androidx.room.Room
+import com.maciejpelcapps.todolistapp.data.ToDoListRepository
+import com.maciejpelcapps.todolistapp.data.database.ToDoEntryDao
 import com.maciejpelcapps.todolistapp.data.database.ToDoListDatabase
 import dagger.Module
 import dagger.Provides
@@ -15,14 +17,19 @@ import javax.inject.Singleton
 object AppModule {
     @Singleton
     @Provides
-    fun provideDataBase(@ApplicationContext app: Application): ToDoListDatabase {
-        return Room.databaseBuilder(app, ToDoListDatabase::class.java, "todo_list_db")
-            .fallbackToDestructiveMigration().build()
+    fun provideDataBase(app: Application): ToDoListDatabase {
+        return Room.databaseBuilder(
+            app,
+            ToDoListDatabase::class.java,
+            "todo_list_db"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Singleton
     @Provides
-    fun provideYourDao(toDoListDatabase: ToDoListDatabase) {
-        toDoListDatabase.toDoEntryDao()
+    fun provideToDoEntryDao(toDoListDatabase: ToDoListDatabase): ToDoEntryDao {
+        return toDoListDatabase.toDoEntryDao()
     }
 }

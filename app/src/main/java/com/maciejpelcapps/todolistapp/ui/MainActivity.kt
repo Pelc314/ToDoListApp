@@ -10,7 +10,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.maciejpelcapps.todolistapp.ui.theme.ToDoListAppTheme
+import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,26 +24,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             ToDoListAppTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "todolistscreen") {
+                    composable("todolistscreen") { ToDoListScreen(navController = navController) }
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ToDoListAppTheme {
-        Greeting("Android")
-    }
-}

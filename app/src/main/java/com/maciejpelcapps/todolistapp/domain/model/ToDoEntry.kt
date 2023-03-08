@@ -1,10 +1,11 @@
-package com.maciejpelcapps.todolistapp.data.database
+package com.maciejpelcapps.todolistapp.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "todos")
-data class ToDoEntryEntity(
+data class ToDoEntry(
     @PrimaryKey(autoGenerate = true)
-    var id:Int? = null
+    var id: Int? = null,
+    val data: String,
 )
