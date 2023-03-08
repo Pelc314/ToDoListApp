@@ -1,6 +1,5 @@
 package com.maciejpelcapps.todolistapp.domain
 
-data class TodoEntry(
-    val id:Int,
+data class ToDoEntry(
     val data:String
 )
