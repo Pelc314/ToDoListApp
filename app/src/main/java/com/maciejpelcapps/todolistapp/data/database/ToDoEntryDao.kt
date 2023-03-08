@@ -11,8 +11,8 @@ interface ToDoEntryDao {
     @Query("SELECT * FROM todos")
     fun getAllTodos(): List<ToDoEntry>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun saveTodo(todoEntry: ToDoEntry)
+    @Insert
+    fun saveTodo(todos: List<ToDoEntry>)
 
     @Delete
     fun deleteTodo(todoEntry: ToDoEntry)

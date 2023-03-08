@@ -19,6 +19,10 @@ class ToDoListViewModel @Inject constructor(
     private var _toDosState = mutableStateOf(ToDoListState())
     val toDosState: State<ToDoListState> = _toDosState
 
+    init {
+        getAllToDos()
+    }
+
     fun getAllToDos() {
         viewModelScope.launch {
             repository.getAllTodos().collect() { toDoList ->
@@ -37,9 +41,11 @@ class ToDoListViewModel @Inject constructor(
         }
     }
 
-    fun saveToDo(toDo: ToDoEntry) {
+    fun saveToDo(toDoEntry: ToDoEntry) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.saveTodo(toDo)
+            val toDos = (_toDosState.value.toDosList) + toDoEntry
+            _toDosState.value = ToDoListState(toDosList = toDos)
+            repository.saveTodo(toDos)
         }
     }
 }

@@ -22,8 +22,8 @@ class ToDoListRepository @Inject constructor(
         }
     }
 
-    suspend fun saveTodo(toDoEntry: ToDoEntry) {
-        toDoListDao.saveTodo(toDoEntry)
+    suspend fun saveTodo(toDos: List<ToDoEntry>) {
+        toDoListDao.saveTodo(toDos)
     }
 
     suspend fun deleteTodo(toDoEntry: ToDoEntry) {
