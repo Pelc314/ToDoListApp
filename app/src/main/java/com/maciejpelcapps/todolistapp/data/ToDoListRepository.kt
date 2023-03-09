@@ -15,8 +15,12 @@ class ToDoListRepository @Inject constructor(
     suspend fun getAllTodos(): Flow<Resource<List<ToDoEntry>>> {
         return flow {
             emit(Resource.Loading())
-                Log.d("todos repository", "${toDoListDao.getAllTodos()}")
-                emit(Resource.Success(data = toDoListDao.getAllTodos()))
+            Log.d("todos repository", "${toDoListDao.getAllTodos()}")
+            emit(
+                Resource.Success(
+                    data = toDoListDao.getAllTodos()
+                )
+            )
         }
     }
 
