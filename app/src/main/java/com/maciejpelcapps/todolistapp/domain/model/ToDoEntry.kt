@@ -8,4 +8,5 @@ data class ToDoEntry(
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null,
     val data: String,
+    var done: Boolean = false,
 )

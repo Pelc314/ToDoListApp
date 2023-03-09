@@ -24,25 +24,24 @@ class ToDoListViewModel @Inject constructor(
 
     init {
         getAllToDos()
-        Log.d("todos init","lol")
+        Log.d("todos init", "lol")
     }
 
     fun getAllToDos() {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getAllTodos().collect() { toDoList ->
+                delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
-                        Log.d("todos success","${toDoList.data}")
-                        delay(100)
-                        val toDoEntries = toDoList.data?: emptyList()
-                        _toDosState.value = ToDoListState(toDoEntries)
+                        Log.d("todos success", "${toDoList.data}")
+                        _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
                     }
                     is Resource.Error -> {
-                        Log.d("todos error","${toDoList.message}")
+                        Log.d("todos error", "${toDoList.message}")
                         _toDosState.value = ToDoListState(error = toDoList.message ?: "Error")
                     }
                     is Resource.Loading -> {
-                        Log.d("todos loading","${toDoList}")
+                        Log.d("todos loading", "${toDoList}")
                     }
                 }
             }
@@ -50,10 +49,27 @@ class ToDoListViewModel @Inject constructor(
     }
 
     fun saveToDo(toDoEntry: ToDoEntry) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch() {
             val toDos = (_toDosState.value.toDosList) + toDoEntry
-            _toDosState.value = ToDoListState(toDosList = toDos)
+            _toDosState.value = _toDosState.value.copy(toDosList = toDos)
             repository.saveTodo(toDoEntry)
+        }
+    }
+
+    fun editToDo(toDoEntry: ToDoEntry, index: Int) {
+        viewModelScope.launch {
+            _toDosState.value.toDosList[index].done = !_toDosState.value.toDosList[index].done
+            _toDosState.value = ToDoListState(toDosList = _toDosState.value.toDosList)
+
+            repository.saveTodo(toDoEntry)
+        }
+    }
+
+    fun deleteToDo(toDoEntry: ToDoEntry) {
+        viewModelScope.launch {
+            val toDos = (_toDosState.value.toDosList) - toDoEntry
+            _toDosState.value = ToDoListState(toDos)
+            repository.deleteTodo(toDoEntry)
         }
     }
 }
