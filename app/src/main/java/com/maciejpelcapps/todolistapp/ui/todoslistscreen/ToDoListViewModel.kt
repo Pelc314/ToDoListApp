@@ -1,5 +1,6 @@
 package com.maciejpelcapps.todolistapp.ui.todoslistscreen
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,8 @@ import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,20 +24,25 @@ class ToDoListViewModel @Inject constructor(
 
     init {
         getAllToDos()
+        Log.d("todos init","lol")
     }
 
     fun getAllToDos() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.getAllTodos().collect() { toDoList ->
                 when (toDoList) {
                     is Resource.Success -> {
-                        _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
+                        Log.d("todos success","${toDoList.data}")
+                        delay(100)
+                        val toDoEntries = toDoList.data?: emptyList()
+                        _toDosState.value = ToDoListState(toDoEntries)
                     }
                     is Resource.Error -> {
+                        Log.d("todos error","${toDoList.message}")
                         _toDosState.value = ToDoListState(error = toDoList.message ?: "Error")
                     }
                     is Resource.Loading -> {
-                        Unit
+                        Log.d("todos loading","${toDoList}")
                     }
                 }
             }
@@ -45,7 +53,7 @@ class ToDoListViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val toDos = (_toDosState.value.toDosList) + toDoEntry
             _toDosState.value = ToDoListState(toDosList = toDos)
-            repository.saveTodo(toDos)
+            repository.saveTodo(toDoEntry)
         }
     }
 }

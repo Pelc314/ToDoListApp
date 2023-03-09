@@ -1,11 +1,11 @@
 package com.maciejpelcapps.todolistapp.data
 
-import androidx.lifecycle.viewmodel.compose.viewModel
+import android.util.Log
 import com.maciejpelcapps.todolistapp.data.database.ToDoEntryDao
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.util.Resource
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -14,16 +14,14 @@ class ToDoListRepository @Inject constructor(
 ) {
     suspend fun getAllTodos(): Flow<Resource<List<ToDoEntry>>> {
         return flow {
-            try {
-                Resource.Success(data = toDoListDao.getAllTodos())
-            } catch (e: Exception) {
-                Resource.Error(message = e.message ?: "unknownError")
-            }
+                Log.d("todos repository", "${toDoListDao.getAllTodos()}")
+                emit(Resource.Success(data = toDoListDao.getAllTodos()))
         }
     }
 
-    suspend fun saveTodo(toDos: List<ToDoEntry>) {
-        toDoListDao.saveTodo(toDos)
+
+    suspend fun saveTodo(toDo: ToDoEntry) {
+        toDoListDao.saveTodo(toDo)
     }
 
     suspend fun deleteTodo(toDoEntry: ToDoEntry) {
