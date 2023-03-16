@@ -2,13 +2,11 @@ package com.maciejpelcapps.todolistapp.di
 
 import android.app.Application
 import androidx.room.Room
-import com.maciejpelcapps.todolistapp.data.ToDoListRepository
 import com.maciejpelcapps.todolistapp.data.database.ToDoEntryDao
 import com.maciejpelcapps.todolistapp.data.database.ToDoListDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 

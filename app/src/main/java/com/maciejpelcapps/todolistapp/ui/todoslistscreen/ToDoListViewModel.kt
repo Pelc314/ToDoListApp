@@ -5,19 +5,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.maciejpelcapps.todolistapp.data.ToDoListRepository
+import com.maciejpelcapps.todolistapp.data.ToDoListRepositoryImpl
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ToDoListViewModel @Inject constructor(
-    private val repository: ToDoListRepository,
+    private val repository: ToDoListRepositoryImpl,
 ) : ViewModel() {
     private var _toDosState = mutableStateOf(ToDoListState())
     val toDosState: State<ToDoListState> = _toDosState
