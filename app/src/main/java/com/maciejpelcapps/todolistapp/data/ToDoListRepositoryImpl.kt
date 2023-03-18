@@ -15,11 +15,13 @@ class ToDoListRepositoryImpl @Inject constructor(
         return flow {
             emit(Resource.Loading())
             Log.d("todos repository", "${toDoListDao.getAllTodos()}")
-            emit(
-                Resource.Success(
-                    data = toDoListDao.getAllTodos()
+            toDoListDao.getAllTodos().collect {
+                emit(
+                    Resource.Success(
+                        data = it
+                    )
                 )
-            )
+            }
         }
     }
 

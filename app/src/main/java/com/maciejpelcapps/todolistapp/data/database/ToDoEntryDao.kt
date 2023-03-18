@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @androidx.room.Dao
 interface ToDoEntryDao {
     @Query("SELECT * FROM todos")
-    fun getAllTodos(): List<ToDoEntry>
+    fun getAllTodos(): Flow<List<ToDoEntry>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveTodo(todo: ToDoEntry)
