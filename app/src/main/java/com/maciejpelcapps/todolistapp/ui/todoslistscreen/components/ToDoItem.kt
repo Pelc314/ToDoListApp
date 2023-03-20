@@ -13,11 +13,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
+import com.maciejpelcapps.todolistapp.ui.theme.GreenToTeal
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -29,33 +30,31 @@ fun ToDoItem(
     index: Int,
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var done by remember {
         mutableStateOf(toDoEntry.done)
     }
-    var itemLookState by remember{ mutableStateOf(ToDoItemLookState.Offset) }
+    var itemLookState by remember { mutableStateOf(ToDoItemLookState.Offset) }
     val transition = updateTransition(targetState = itemLookState)
-    val offset by transition.animateOffset(transitionSpec = { tween(1000) }) { offset ->
-        when(offset){
-        ToDoItemLookState.Offset -> Offset(200f, 0f)
-        ToDoItemLookState.Normal->Offset(0f, 0f)
+    val offset by transition.animateOffset(transitionSpec = { tween(1000) }, label = "") { offset ->
+        when (offset) {
+            ToDoItemLookState.Offset -> Offset(
+                LocalConfiguration.current.screenWidthDp.dp.value,
+                0f
+            )
+            ToDoItemLookState.Normal -> Offset(0f, 0f)
         }
     }
-    LaunchedEffect(itemLookState){
+    LaunchedEffect(itemLookState) {
         itemLookState = ToDoItemLookState.Normal
     }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
             .offset(offset.x.dp, offset.y.dp)
             .background(
-                brush = Brush.horizontalGradient(
-                    listOf(
-                        Color(0xC19DFFF5),
-                        Color(0x88B0FCA0)
-                    )
-                ), shape = RoundedCornerShape(16.dp)
+                brush = GreenToTeal, shape = RoundedCornerShape(16.dp)
             )
             .fillMaxWidth()
             .heightIn(40.dp)
@@ -78,7 +77,9 @@ fun ToDoItem(
                         .weight(1f)
                         .align(CenterVertically),
                     text = toDoEntry.data,
-                    fontWeight = FontWeight.Light
+                    fontWeight = FontWeight.Light,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             } else {
                 Text(
@@ -86,10 +87,12 @@ fun ToDoItem(
                         .weight(1f)
                         .align(CenterVertically),
                     text = toDoEntry.data,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            IconButton(modifier = Modifier.align(CenterVertically),onClick = {
+            IconButton(modifier = Modifier.align(CenterVertically), onClick = {
                 viewModel.deleteToDo(toDoEntry)
                 scope.launch {
                     scaffoldState.snackbarHostState.showSnackbar(message = "Task deleted")

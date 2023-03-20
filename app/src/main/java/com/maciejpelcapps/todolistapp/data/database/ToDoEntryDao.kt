@@ -1,20 +1,18 @@
 package com.maciejpelcapps.todolistapp.data.database
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import kotlinx.coroutines.flow.Flow
 
-@androidx.room.Dao
+@Dao
 interface ToDoEntryDao {
     @Query("SELECT * FROM todos")
     fun getAllTodos(): Flow<List<ToDoEntry>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun saveTodo(todo: ToDoEntry)
-
+    @Query("SELECT * FROM todos WHERE id = :id")
+    suspend fun getToDoById(id: Int): ToDoEntry?
     @Delete
     suspend fun deleteTodo(todoEntry: ToDoEntry)
 }

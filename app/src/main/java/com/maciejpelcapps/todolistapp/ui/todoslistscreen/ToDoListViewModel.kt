@@ -58,8 +58,9 @@ class ToDoListViewModel @Inject constructor(
     fun editToDo(toDoEntry: ToDoEntry, index: Int) {
         viewModelScope.launch {
             _toDosState.value.toDosList[index].done = !_toDosState.value.toDosList[index].done
+            _toDosState.value.toDosList[index].data = toDoEntry.data
             _toDosState.value = ToDoListState(toDosList = _toDosState.value.toDosList)
-
+            //stuff above is used just to update screen, below updates db
             repository.saveTodo(toDoEntry)
         }
     }
