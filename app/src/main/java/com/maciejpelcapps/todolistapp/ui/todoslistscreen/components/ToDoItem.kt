@@ -1,6 +1,8 @@
 package com.maciejpelcapps.todolistapp.ui.todoslistscreen.components
 
-import android.content.res.Resources.Theme
+import androidx.compose.animation.core.animateOffset
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,12 +10,11 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
@@ -28,14 +29,26 @@ fun ToDoItem(
     index: Int,
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
+    modifier: Modifier = Modifier
 ) {
     var done by remember {
         mutableStateOf(toDoEntry.done)
     }
-
+    var itemLookState by remember{ mutableStateOf(ToDoItemLookState.Offset) }
+    val transition = updateTransition(targetState = itemLookState)
+    val offset by transition.animateOffset(transitionSpec = { tween(1000) }) { offset ->
+        when(offset){
+        ToDoItemLookState.Offset -> Offset(200f, 0f)
+        ToDoItemLookState.Normal->Offset(0f, 0f)
+        }
+    }
+    LaunchedEffect(itemLookState){
+        itemLookState = ToDoItemLookState.Normal
+    }
     Box(
         modifier = Modifier
             .padding(8.dp)
+            .offset(offset.x.dp, offset.y.dp)
             .background(
                 brush = Brush.horizontalGradient(
                     listOf(
@@ -50,7 +63,7 @@ fun ToDoItem(
         Row() {
             RadioButton(
                 selected = done,
-                modifier = Modifier.align(Alignment.CenterVertically),
+                modifier = modifier.align(CenterVertically),
                 onClick = {
                     done = !done
                     viewModel.editToDo(
@@ -62,14 +75,16 @@ fun ToDoItem(
             if (done) {
                 Text(
                     modifier = Modifier
-                        .weight(1f).align(CenterVertically),
+                        .weight(1f)
+                        .align(CenterVertically),
                     text = toDoEntry.data,
                     fontWeight = FontWeight.Light
                 )
             } else {
                 Text(
                     modifier = Modifier
-                        .weight(1f).align(CenterVertically),
+                        .weight(1f)
+                        .align(CenterVertically),
                     text = toDoEntry.data,
                     fontWeight = FontWeight.Bold
                 )
@@ -87,4 +102,9 @@ fun ToDoItem(
             }
         }
     }
+}
+
+private enum class ToDoItemLookState {
+    Offset,
+    Normal
 }

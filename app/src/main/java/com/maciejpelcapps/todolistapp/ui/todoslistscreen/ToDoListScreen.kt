@@ -1,6 +1,8 @@
 package com.maciejpelcapps.todolistapp.ui.todoslistscreen
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -20,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.ToDoItem
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ToDoListScreen(
@@ -60,15 +63,16 @@ fun ToDoListScreen(
         Column(modifier = Modifier.padding(16.dp)) {
             LazyColumn(modifier = Modifier.weight(1f)) {
                 items(toDosListState.toDosList.size) { index ->
-                    ToDoItem(
-                        toDoEntry = toDosListState.toDosList[index],
-                        viewModel = viewModel,
-                        index = index,
-                        scope = scope,
-                        scaffoldState = scaffoldState
-                    )
+                        ToDoItem(
+                            toDoEntry = toDosListState.toDosList[index],
+                            viewModel = viewModel,
+                            index = index,
+                            scope = scope,
+                            scaffoldState = scaffoldState,
+                            modifier = Modifier
+                        )
+                    }
                 }
-            }
             if (addingNewToDo) {
                 Row(
                     modifier = Modifier
@@ -82,7 +86,9 @@ fun ToDoListScreen(
                             Text(text = "What you want to do?")
                         }, modifier = Modifier.weight(1f)
                     )
-                    IconButton(modifier = Modifier.padding(start = 20.dp).scale(1.5f), onClick = {
+                    IconButton(modifier = Modifier
+                        .padding(start = 20.dp)
+                        .scale(1.5f), onClick = {
                         if (!text.isBlank()) {
                             viewModel.saveToDo(ToDoEntry(data = text))
                             text = ""
