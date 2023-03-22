@@ -21,6 +21,8 @@ import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.ui.theme.GreenToTeal
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -35,20 +37,26 @@ fun ToDoItem(
     var done by remember {
         mutableStateOf(toDoEntry.done)
     }
-    var itemLookState by remember { mutableStateOf(ToDoItemLookState.Offset) }
+//    val scope = rememberCoroutineScope()
+    var itemLookState by remember { mutableStateOf(ToDoItemLookState.OffsetRight) }
     val transition = updateTransition(targetState = itemLookState)
     val offset by transition.animateOffset(transitionSpec = { tween(1000) }, label = "") { offset ->
         when (offset) {
-            ToDoItemLookState.Offset -> Offset(
+            ToDoItemLookState.OffsetRight -> Offset(
                 LocalConfiguration.current.screenWidthDp.dp.value,
                 0f
             )
             ToDoItemLookState.Normal -> Offset(0f, 0f)
+            ToDoItemLookState.OffsetLeft -> Offset(
+                -LocalConfiguration.current.screenWidthDp.dp.value,
+                0f
+            )
         }
     }
-    LaunchedEffect(itemLookState) {
+    LaunchedEffect(scope) {
         itemLookState = ToDoItemLookState.Normal
     }
+
     Box(
         modifier = modifier
             .padding(8.dp)
@@ -93,9 +101,10 @@ fun ToDoItem(
                 )
             }
             IconButton(modifier = Modifier.align(CenterVertically), onClick = {
-                viewModel.deleteToDo(toDoEntry)
                 scope.launch {
+                    itemLookState = ToDoItemLookState.OffsetLeft //Animation when deleting and item
                     scaffoldState.snackbarHostState.showSnackbar(message = "Task deleted")
+                    viewModel.deleteToDo(toDoEntry)
                 }
             }) {
                 Icon(
@@ -108,6 +117,7 @@ fun ToDoItem(
 }
 
 private enum class ToDoItemLookState {
-    Offset,
-    Normal
+    OffsetRight,
+    Normal,
+    OffsetLeft
 }
