@@ -2,6 +2,7 @@ package com.maciejpelcapps.todolistapp.ui.todoslistscreen
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateOffset
 import androidx.compose.animation.core.animateSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -41,8 +43,6 @@ fun ToDoListScreen(
     navController: NavController,
     viewModel: ToDoListViewModel = hiltViewModel(),
 ) {
-
-
     var text by rememberSaveable {
         mutableStateOf("")
     }
@@ -55,12 +55,13 @@ fun ToDoListScreen(
     var addingOrEditingToDo by rememberSaveable {
         mutableStateOf(false)
     }
+
     var addEditToDoSize by remember { mutableStateOf(AddNewTodoScale.Hidden) }
     val addingNewToDoWindowTransition = updateTransition(
         targetState = addEditToDoSize,
         label = ""
     )
-    val addingToDoWindowSize by addingNewToDoWindowTransition.animateSize(
+    val addingToDoWindowSizeAnim by addingNewToDoWindowTransition.animateSize(
         transitionSpec = { tween(1000) },
         label = ""
     ) { scale ->
@@ -72,6 +73,28 @@ fun ToDoListScreen(
             )
         }
     }
+
+    var addEditToDoOffset by remember {
+        mutableStateOf(AddNewTodoOffset.OffsetRight)
+    }
+    val addEditToDoOffsetTransition = updateTransition(targetState = addEditToDoOffset)
+    val addEditTodoOffsetAnim by addEditToDoOffsetTransition.animateOffset(
+        transitionSpec = { tween(1000) },
+        label = ""
+    ) { offset ->
+        when (offset) {
+            AddNewTodoOffset.OffsetRight -> Offset(
+                LocalConfiguration.current.screenWidthDp.dp.value / 2,
+                0f
+            )
+            AddNewTodoOffset.Normal -> Offset(
+                0f,
+                0f
+            )
+        }
+
+    }
+
     val toDosListState = viewModel.toDosState.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -95,6 +118,7 @@ fun ToDoListScreen(
             FloatingActionButton(onClick = {
                 addingOrEditingToDo = true
                 addEditToDoSize = AddNewTodoScale.Normal
+                addEditToDoOffset = AddNewTodoOffset.Normal
             }) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Add FAB")
             }
@@ -115,6 +139,7 @@ fun ToDoListScreen(
                             id = toDosListState.toDosList[index].id ?: -1
                             whichElement = index
                             addEditToDoSize = AddNewTodoScale.Normal
+                            addEditToDoOffset = AddNewTodoOffset.Normal
                         }
                     )
                 }
@@ -131,8 +156,12 @@ fun ToDoListScreen(
                         contentAlignment = Center,
                         modifier = Modifier
                             .size(
-                                height = addingToDoWindowSize.height.dp,
-                                width = addingToDoWindowSize.width.dp
+                                height = addingToDoWindowSizeAnim.height.dp,
+                                width = addingToDoWindowSizeAnim.width.dp
+                            )
+                            .offset(
+                                x = addEditTodoOffsetAnim.x.dp,
+                                y = addEditTodoOffsetAnim.y.dp
                             )
                             .background(
                                 Color.LightGray.copy(alpha = 0.5f),
@@ -142,6 +171,7 @@ fun ToDoListScreen(
                             .clickable {
                                 scope.launch {
                                     addEditToDoSize = AddNewTodoScale.Hidden
+                                    addEditToDoOffset = AddNewTodoOffset.OffsetRight
                                     delay(1000)
                                     addingOrEditingToDo = !addingOrEditingToDo
                                 }
@@ -196,6 +226,7 @@ fun ToDoListScreen(
                                         text = ""
                                         scope.launch {
                                             addEditToDoSize = AddNewTodoScale.Hidden
+                                            addEditToDoOffset = AddNewTodoOffset.OffsetRight
                                             delay(1000)
                                             addingOrEditingToDo = false
                                         }
@@ -222,5 +253,10 @@ fun ToDoListScreen(
 
 private enum class AddNewTodoScale {
     Hidden,
+    Normal
+}
+
+private enum class AddNewTodoOffset {
+    OffsetRight,
     Normal
 }
