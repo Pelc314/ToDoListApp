@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
+import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.AddEditTodo
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.ToDoItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -146,117 +147,39 @@ fun ToDoListScreen(
             }
         }
         if (addingOrEditingToDo) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Row(
-                    modifier = Modifier
-                        .align(CenterHorizontally)
-                        .fillMaxSize()
-                ) {
-                    Box(
-                        contentAlignment = Center,
-                        modifier = Modifier
-                            .size(
-                                height = addingToDoWindowSizeAnim.height.dp,
-                                width = addingToDoWindowSizeAnim.width.dp
-                            )
-                            .offset(
-                                x = addEditTodoOffsetAnim.x.dp,
-                                y = addEditTodoOffsetAnim.y.dp
-                            )
-                            .background(
-                                Color.LightGray.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .align(CenterVertically)
-                            .clickable {
-                                scope.launch {
-                                    addEditToDoSize = AddNewTodoScale.Hidden
-                                    addEditToDoOffset = AddNewTodoOffset.OffsetRight
-                                    delay(1000)
-                                    addingOrEditingToDo = !addingOrEditingToDo
-                                }
-                            }
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .height(300.dp)
-                                .align(Center)
-                                .background(Color.White, shape = RoundedCornerShape(16.dp))
-                                .clickable() { }
-                        ) {
-                            Column() {
-                                TextField(
-                                    value = text,
-                                    onValueChange = { text = it },
-                                    placeholder = {
-                                        Text(text = "What do you want to do?")
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 16.dp, horizontal = 8.dp)
-                                        .align(CenterHorizontally)
-                                        .weight(1f)
-                                )
-                                IconButton(modifier = Modifier
-                                    .scale(1.5f)
-                                    .align(CenterHorizontally), onClick = {
-                                    if (!text.isBlank()) {
-                                        if (whichElement == -1) {
-                                            viewModel.saveToDo(ToDoEntry(data = text))
-                                            scope.launch {
-                                                scaffoldState.snackbarHostState.showSnackbar(
-                                                    message = "Task saved"
-                                                )
-                                            }
-                                        } else {
-                                            viewModel.editToDo(
-                                                toDoEntry = ToDoEntry(
-                                                    id = id,
-                                                    data = text
-                                                ), index = whichElement
-                                            )
-                                            scope.launch {
-                                                scaffoldState.snackbarHostState.showSnackbar(
-                                                    message = "Task edited"
-                                                )
-                                            }
-                                        }
-                                        whichElement = -1
-                                        text = ""
-                                        scope.launch {
-                                            addEditToDoSize = AddNewTodoScale.Hidden
-                                            addEditToDoOffset = AddNewTodoOffset.OffsetRight
-                                            delay(1000)
-                                            addingOrEditingToDo = false
-                                        }
-                                    } else {
-                                        scope.launch {
-                                            scaffoldState.snackbarHostState.showSnackbar(message = "Task cannot be empty")
-                                        }
-                                    }
-
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Save,
-                                        contentDescription = "Save button",
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            AddEditTodo(
+                whichElement = whichElement,
+                addingOrEditingToDo = addingOrEditingToDo,
+                scope = scope,
+                scaffoldState = scaffoldState,
+                textOfPrompt = text,
+                viewModel = viewModel,
+                id = id,
+                changeAddingOrEditingTodoBoolean = { addingOrEditingToDo = it },
+                changeWhichElement = { whichElement = it },
+                modifier = Modifier
+                    .size(
+                        height = addingToDoWindowSizeAnim.height.dp,
+                        width = addingToDoWindowSizeAnim.width.dp
+                    )
+                    .offset(
+                        x = addEditTodoOffsetAnim.x.dp,
+                        y = addEditTodoOffsetAnim.y.dp
+                    ),
+                changePromptSize = { addEditToDoSize = it },
+                changePromptOffset = { addEditToDoOffset = it },
+                changeTextValue = {text = it}
+            )
         }
     }
 }
 
-private enum class AddNewTodoScale {
+enum class AddNewTodoScale {
     Hidden,
     Normal
 }
 
-private enum class AddNewTodoOffset {
+enum class AddNewTodoOffset {
     OffsetRight,
     Normal
 }
