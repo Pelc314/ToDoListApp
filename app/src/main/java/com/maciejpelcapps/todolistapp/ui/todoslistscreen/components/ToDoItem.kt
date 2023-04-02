@@ -15,12 +15,13 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
-import com.maciejpelcapps.todolistapp.ui.theme.GreenToTeal
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -33,6 +34,7 @@ fun ToDoItem(
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     modifier: Modifier = Modifier,
+    taskColor: Int = -1,
 ) {
     var done by remember {
         mutableStateOf(toDoEntry.done)
@@ -71,12 +73,22 @@ fun ToDoItem(
         itemLookState = ToDoItemLookState.Normal
     }
 
+    var color by rememberSaveable() {
+        mutableStateOf(taskColor)
+    }
+
+    if (taskColor == -1) {
+        color = ToDoEntry.noteColors.get(5).toArgb()
+    } else {
+        color = taskColor
+    }
+
     Box(
         modifier = modifier
             .padding(8.dp)
             .offset(offset.x.dp, offset.y.dp)
             .background(
-                brush = GreenToTeal, shape = RoundedCornerShape(16.dp)
+                color = Color(color), shape = RoundedCornerShape(16.dp)
             )
             .fillMaxWidth()
             .heightIn(40.dp)

@@ -46,7 +46,7 @@ fun ToDoListScreen(
     var id by rememberSaveable {
         mutableStateOf(-1)
     }
-    var noteColor by rememberSaveable {
+    var taskColor by rememberSaveable {
         mutableStateOf(-1)
     }
     var addingOrEditingToDo by rememberSaveable {
@@ -124,17 +124,19 @@ fun ToDoListScreen(
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             LazyColumn(modifier = Modifier) {
                 items(toDosListState.toDosList.size) { index ->
+                    taskColor = toDosListState.toDosList[index].color
                     ToDoItem(
                         toDoEntry = toDosListState.toDosList[index],
                         viewModel = viewModel,
                         index = index,
                         scope = scope,
                         scaffoldState = scaffoldState,
+                        taskColor = taskColor,
                         modifier = Modifier.clickable {
                             addingOrEditingToDo = true
                             text = toDosListState.toDosList[index].data
                             id = toDosListState.toDosList[index].id ?: -1
-                            noteColor = toDosListState.toDosList[index].color
+                            taskColor = toDosListState.toDosList[index].color
                             whichElement = index
                             addEditToDoSize = AddNewTodoScale.Normal
                             addEditToDoOffset = AddNewTodoOffset.Normal
@@ -152,7 +154,7 @@ fun ToDoListScreen(
                 textOfPrompt = text,
                 viewModel = viewModel,
                 id = id,
-                passedTaskColor = noteColor,
+                passedTaskColor = taskColor,
                 changeAddingOrEditingTodoBoolean = { addingOrEditingToDo = it },
                 changeWhichElement = { whichElement = it },
                 changePromptSize = { addEditToDoSize = it },
