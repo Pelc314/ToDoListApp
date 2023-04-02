@@ -10,8 +10,10 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
@@ -21,8 +23,6 @@ import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.ui.theme.GreenToTeal
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -38,9 +38,13 @@ fun ToDoItem(
         mutableStateOf(toDoEntry.done)
     }
 //    val scope = rememberCoroutineScope()
+    var animTime = 1000
     var itemLookState by remember { mutableStateOf(ToDoItemLookState.OffsetRight) }
     val transition = updateTransition(targetState = itemLookState)
-    val offset by transition.animateOffset(transitionSpec = { tween(1000) }, label = "") { offset ->
+    val offset by transition.animateOffset(
+        transitionSpec = { tween(animTime) },
+        label = ""
+    ) { offset ->
         when (offset) {
             ToDoItemLookState.OffsetRight -> Offset(
                 LocalConfiguration.current.screenWidthDp.dp.value,
@@ -51,8 +55,18 @@ fun ToDoItem(
                 -LocalConfiguration.current.screenWidthDp.dp.value,
                 0f
             )
+            ToDoItemLookState.OffsetDown -> Offset(x = 0f, y = 60.dp.value)
+            ToDoItemLookState.OffsetLeftUp -> Offset(
+                -LocalConfiguration.current.screenWidthDp.dp.value,
+                -60.dp.value
+            )
         }
     }
+
+    var customAlpha by rememberSaveable() {
+        mutableStateOf(1f)
+    }
+
     LaunchedEffect(scope) {
         itemLookState = ToDoItemLookState.Normal
     }
@@ -66,6 +80,7 @@ fun ToDoItem(
             )
             .fillMaxWidth()
             .heightIn(40.dp)
+            .alpha(customAlpha)
     ) {
         Row() {
             RadioButton(
@@ -77,7 +92,6 @@ fun ToDoItem(
                         toDoEntry = toDoEntry,
                         index = index
                     )
-
                 })
             if (done) {
                 Text(
@@ -102,9 +116,8 @@ fun ToDoItem(
             }
             IconButton(modifier = Modifier.align(CenterVertically), onClick = {
                 scope.launch {
-                    itemLookState = ToDoItemLookState.OffsetLeft //Animation when deleting and item
-                    scaffoldState.snackbarHostState.showSnackbar(message = "Task deleted")
                     viewModel.deleteToDo(toDoEntry)
+                    scaffoldState.snackbarHostState.showSnackbar(message = "Task deleted")
                 }
             }) {
                 Icon(
@@ -119,5 +132,7 @@ fun ToDoItem(
 private enum class ToDoItemLookState {
     OffsetRight,
     Normal,
-    OffsetLeft
+    OffsetLeft,
+    OffsetDown,
+    OffsetLeftUp
 }

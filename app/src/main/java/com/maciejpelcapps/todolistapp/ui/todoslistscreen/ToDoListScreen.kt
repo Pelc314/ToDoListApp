@@ -7,21 +7,17 @@ import androidx.compose.animation.core.animateSize
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -31,13 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.AddEditTodo
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.ToDoItem
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ToDoListScreen(
@@ -51,6 +44,9 @@ fun ToDoListScreen(
         mutableStateOf(-1)
     }
     var id by rememberSaveable {
+        mutableStateOf(-1)
+    }
+    var noteColor by rememberSaveable {
         mutableStateOf(-1)
     }
     var addingOrEditingToDo by rememberSaveable {
@@ -138,6 +134,7 @@ fun ToDoListScreen(
                             addingOrEditingToDo = true
                             text = toDosListState.toDosList[index].data
                             id = toDosListState.toDosList[index].id ?: -1
+                            noteColor = toDosListState.toDosList[index].color
                             whichElement = index
                             addEditToDoSize = AddNewTodoScale.Normal
                             addEditToDoOffset = AddNewTodoOffset.Normal
@@ -155,8 +152,12 @@ fun ToDoListScreen(
                 textOfPrompt = text,
                 viewModel = viewModel,
                 id = id,
+                noteColor = noteColor,
                 changeAddingOrEditingTodoBoolean = { addingOrEditingToDo = it },
                 changeWhichElement = { whichElement = it },
+                changePromptSize = { addEditToDoSize = it },
+                changePromptOffset = { addEditToDoOffset = it },
+                changeTextValue = { text = it },
                 modifier = Modifier
                     .size(
                         height = addingToDoWindowSizeAnim.height.dp,
@@ -165,10 +166,7 @@ fun ToDoListScreen(
                     .offset(
                         x = addEditTodoOffsetAnim.x.dp,
                         y = addEditTodoOffsetAnim.y.dp
-                    ),
-                changePromptSize = { addEditToDoSize = it },
-                changePromptOffset = { addEditToDoOffset = it },
-                changeTextValue = {text = it}
+                    )
             )
         }
     }

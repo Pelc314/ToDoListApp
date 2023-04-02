@@ -3,6 +3,7 @@ package com.maciejpelcapps.todolistapp.ui.todoslistscreen
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maciejpelcapps.todolistapp.data.ToDoListRepositoryImpl
@@ -21,9 +22,11 @@ class ToDoListViewModel @Inject constructor(
     private var _toDosState = mutableStateOf(ToDoListState())
     val toDosState: State<ToDoListState> = _toDosState
 
+    private val _noteColor = mutableStateOf<Int>(ToDoEntry.noteColors.get(5).toArgb())
+    val noteColor: State<Int> = _noteColor
+
     init {
         getAllToDos()
-        Log.d("todos init", "lol")
     }
 
     fun getAllToDos() {
@@ -51,7 +54,7 @@ class ToDoListViewModel @Inject constructor(
         viewModelScope.launch() {
             val toDos = (_toDosState.value.toDosList) + toDoEntry
             _toDosState.value = _toDosState.value.copy(toDosList = toDos)
-            repository.saveTodo(toDoEntry)
+            repository.saveTodo(toDoEntry.copy(color = noteColor.value))
         }
     }
 
@@ -60,16 +63,21 @@ class ToDoListViewModel @Inject constructor(
             _toDosState.value.toDosList[index].done = !_toDosState.value.toDosList[index].done
             _toDosState.value.toDosList[index].data = toDoEntry.data
             _toDosState.value = ToDoListState(toDosList = _toDosState.value.toDosList)
-            //stuff above is used just to update screen, below updates db
-            repository.saveTodo(toDoEntry)
+            //stuff above is used just to update screen, below updates the db
+            repository.saveTodo(toDoEntry.copy(color = noteColor.value))
         }
     }
 
     fun deleteToDo(toDoEntry: ToDoEntry) {
         viewModelScope.launch {
             val toDos = (_toDosState.value.toDosList) - toDoEntry
-            _toDosState.value = ToDoListState(toDos)
             repository.deleteTodo(toDoEntry)
+            _toDosState.value = ToDoListState(toDos)
+
         }
+    }
+
+    fun changeColor(colorInt: Int) {
+        _noteColor.value = colorInt
     }
 }

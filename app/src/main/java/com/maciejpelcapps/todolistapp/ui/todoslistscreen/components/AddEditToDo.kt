@@ -1,26 +1,26 @@
 package com.maciejpelcapps.todolistapp.ui.todoslistscreen.components
 
-import androidx.compose.animation.core.animateOffset
-import androidx.compose.animation.core.animateSize
+import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.AddNewTodoOffset
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.AddNewTodoScale
@@ -39,51 +39,20 @@ fun AddEditTodo(
     textOfPrompt: String,
     viewModel: ToDoListViewModel,
     id: Int,
+    noteColor: Int,
     changeAddingOrEditingTodoBoolean: (Boolean) -> Unit,
     changeWhichElement: (Int) -> Unit,
-    modifier: Modifier = Modifier,
     changePromptSize: (AddNewTodoScale) -> Unit,
     changePromptOffset: (AddNewTodoOffset) -> Unit,
-    changeTextValue: (String) -> Unit
+    changeTextValue: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-//    var addEditToDoSize by remember { mutableStateOf(AddNewTodoScale.Hidden) }
-//    val addingNewToDoWindowTransition = updateTransition(
-//        targetState = addEditToDoSize,
-//        label = ""
-//    )
-//    val addingToDoWindowSizeAnim by addingNewToDoWindowTransition.animateSize(
-//        transitionSpec = { tween(1000) },
-//        label = ""
-//    ) { scale ->
-//        when (scale) {
-//            AddNewTodoScale.Hidden -> Size(0.5f, 0.5f)
-//            AddNewTodoScale.Normal -> Size(
-//                LocalConfiguration.current.screenWidthDp.dp.value,
-//                LocalConfiguration.current.screenHeightDp.dp.value
-//            )
-//        }
-//    }
-//
-//    var addEditToDoOffset by remember {
-//        mutableStateOf(AddNewTodoOffset.OffsetRight)
-//    }
-//    val addEditToDoOffsetTransition = updateTransition(targetState = addEditToDoOffset)
-//    val addEditTodoOffsetAnim by addEditToDoOffsetTransition.animateOffset(
-//        transitionSpec = { tween(1000) },
-//        label = ""
-//    ) { offset ->
-//        when (offset) {
-//            AddNewTodoOffset.OffsetRight -> Offset(
-//                LocalConfiguration.current.screenWidthDp.dp.value / 2,
-//                0f
-//            )
-//            AddNewTodoOffset.Normal -> Offset(
-//                0f,
-//                0f
-//            )
-//        }
-//
-//    }
+
+    val taskBackgroundAnimatable = remember {
+        Animatable(
+            Color(if (noteColor != -1) noteColor else viewModel.noteColor.value),
+        )
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -111,11 +80,49 @@ fun AddEditTodo(
                 Column(
                     modifier = Modifier
                         .padding(16.dp)
-                        .height(300.dp)
+                        .heightIn(min = 100.dp, max = 350.dp)
                         .align(Alignment.Center)
-                        .background(Color.White, shape = RoundedCornerShape(16.dp))
+                        .background(
+                            (taskBackgroundAnimatable.value),
+                            shape = RoundedCornerShape(16.dp)
+                        )
                         .clickable() { }
                 ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        ToDoEntry.noteColors.forEach { color ->
+                            val colorInt = color.toArgb()
+                            Box(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .shadow(15.dp, CircleShape)
+                                    .clip(CircleShape)
+                                    .background(color)
+                                    .border(
+                                        width = 3.dp,
+                                        color = if (viewModel.noteColor.value == colorInt) {
+                                            Color.Black
+                                        } else {
+                                            Color.Transparent
+                                        },
+                                        shape = CircleShape,
+                                    )
+                                    .clickable {
+                                        scope.launch {
+                                            taskBackgroundAnimatable.animateTo(
+                                                targetValue = Color(colorInt),
+                                                animationSpec = tween(durationMillis = 500),
+                                            )
+                                        }
+                                        viewModel.changeColor(colorInt)
+                                    },
+                            )
+                        }
+                    }
                     Column() {
                         TextField(
                             value = textOfPrompt,
@@ -128,9 +135,11 @@ fun AddEditTodo(
                                 .padding(vertical = 16.dp, horizontal = 8.dp)
                                 .align(Alignment.CenterHorizontally)
                                 .weight(1f)
+                                .background(Color.White)
                         )
                         IconButton(modifier = Modifier
-                            .scale(1.5f)
+                            .scale(1.7f)
+                            .padding(bottom = 8.dp)
                             .align(Alignment.CenterHorizontally), onClick = {
                             if (!textOfPrompt.isBlank()) {
                                 if (whichElement == -1) {
