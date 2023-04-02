@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +40,7 @@ fun AddEditTodo(
     textOfPrompt: String,
     viewModel: ToDoListViewModel,
     id: Int,
-    noteColor: Int,
+    passedTaskColor: Int,
     changeAddingOrEditingTodoBoolean: (Boolean) -> Unit,
     changeWhichElement: (Int) -> Unit,
     changePromptSize: (AddNewTodoScale) -> Unit,
@@ -50,8 +51,12 @@ fun AddEditTodo(
 
     val taskBackgroundAnimatable = remember {
         Animatable(
-            Color(if (noteColor != -1) noteColor else viewModel.noteColor.value),
+            Color(if (passedTaskColor != -1) passedTaskColor else viewModel.noteColor.value),
         )
+    }
+
+    LaunchedEffect(scope) {
+        viewModel.changeColor(passedTaskColor)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {

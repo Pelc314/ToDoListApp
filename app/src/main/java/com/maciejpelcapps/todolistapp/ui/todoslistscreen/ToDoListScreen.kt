@@ -152,7 +152,7 @@ fun ToDoListScreen(
                 textOfPrompt = text,
                 viewModel = viewModel,
                 id = id,
-                noteColor = noteColor,
+                passedTaskColor = noteColor,
                 changeAddingOrEditingTodoBoolean = { addingOrEditingToDo = it },
                 changeWhichElement = { whichElement = it },
                 changePromptSize = { addEditToDoSize = it },

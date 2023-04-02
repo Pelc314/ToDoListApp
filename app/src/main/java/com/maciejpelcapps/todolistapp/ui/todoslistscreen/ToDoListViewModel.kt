@@ -55,6 +55,7 @@ class ToDoListViewModel @Inject constructor(
             val toDos = (_toDosState.value.toDosList) + toDoEntry
             _toDosState.value = _toDosState.value.copy(toDosList = toDos)
             repository.saveTodo(toDoEntry.copy(color = noteColor.value))
+            _noteColor.value = -1
         }
     }
 
@@ -65,6 +66,7 @@ class ToDoListViewModel @Inject constructor(
             _toDosState.value = ToDoListState(toDosList = _toDosState.value.toDosList)
             //stuff above is used just to update screen, below updates the db
             repository.saveTodo(toDoEntry.copy(color = noteColor.value))
+            _noteColor.value = -1
         }
     }
 
