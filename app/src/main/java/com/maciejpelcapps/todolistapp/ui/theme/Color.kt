@@ -13,8 +13,8 @@ val GreenToTeal = Brush.horizontalGradient(
         Color(0xC19DFFF5)
     )
 )
-val lightGreen = Color(0x88B0FCA0)
-val lightTeal =         Color(0xC19DFFF5)
+val lightGreen = Color(0xFFB0FCA0)
+val lightTeal = Color(0xC19DFFF5)
 
 val RedOrange = Color(0xffffab91)
 val RedPink = Color(0xfff48fb1)

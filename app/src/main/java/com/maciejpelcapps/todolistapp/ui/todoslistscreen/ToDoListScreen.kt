@@ -15,19 +15,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.AddEditTodo
+import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.OrderSection
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.ToDoItem
 import com.maciejpelcapps.todolistapp.util.Constants
 import kotlinx.coroutines.delay
@@ -101,19 +99,6 @@ fun ToDoListScreen(
 
     Scaffold(
         scaffoldState = scaffoldState,
-        topBar = {
-            TopAppBar {
-                Text(
-                    text = "To do list",
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier
-                        .align(CenterVertically)
-                        .padding(8.dp)
-                )
-            }
-        },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 scope.launch {
@@ -136,7 +121,36 @@ fun ToDoListScreen(
             }
         }
     ) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Your tasks",
+                    style = MaterialTheme.typography.h4,
+                )
+                IconButton(onClick = { viewModel.changeSortMenuVisibility() }) {
+                    Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
+                }
+            }
+            AnimatedVisibility(
+                visible = viewModel.sortToggleExpanded.value,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically(),
+            ) {
+                OrderSection(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    taskOrder = Unit,
+                    onOrderChange = {
+                        Unit
+                    },
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier) {
                 items(toDosListState.toDosList.size) { index ->
                     ToDoItem(

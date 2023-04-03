@@ -22,6 +22,9 @@ class ToDoListViewModel @Inject constructor(
     private var _toDosState = mutableStateOf(ToDoListState())
     val toDosState: State<ToDoListState> = _toDosState
 
+    private var _sortToggleExpanded = mutableStateOf(false)
+    val sortToggleExpanded: State<Boolean> = _sortToggleExpanded
+
     private val _taskColor = mutableStateOf<Int>(ToDoEntry.noteColors[0].toArgb())
     val taskColor: State<Int> = _taskColor
 
@@ -84,5 +87,9 @@ class ToDoListViewModel @Inject constructor(
 
     fun resetColorToDefault() {
         _taskColor.value = ToDoEntry.noteColors[0].toArgb()
+    }
+
+    fun changeSortMenuVisibility() {
+        _sortToggleExpanded.value = !_sortToggleExpanded.value
     }
 }
