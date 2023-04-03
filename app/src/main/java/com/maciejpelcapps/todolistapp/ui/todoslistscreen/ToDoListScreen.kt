@@ -47,7 +47,7 @@ fun ToDoListScreen(
         mutableStateOf(-1)
     }
     var taskColor by rememberSaveable {
-        mutableStateOf(-1)
+        mutableStateOf(viewModel.taskColor.value)
     }
     var addingOrEditingToDo by rememberSaveable {
         mutableStateOf(false)
@@ -155,6 +155,7 @@ fun ToDoListScreen(
                 viewModel = viewModel,
                 id = id,
                 passedTaskColor = taskColor,
+                resetColor = { taskColor = it },
                 changeAddingOrEditingTodoBoolean = { addingOrEditingToDo = it },
                 changeWhichElement = { whichElement = it },
                 changePromptSize = { addEditToDoSize = it },

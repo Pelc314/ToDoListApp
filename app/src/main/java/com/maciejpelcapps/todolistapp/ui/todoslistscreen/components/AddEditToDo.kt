@@ -47,11 +47,14 @@ fun AddEditTodo(
     changePromptOffset: (AddNewTodoOffset) -> Unit,
     changeTextValue: (String) -> Unit,
     modifier: Modifier = Modifier,
+    resetColor: (Int) -> Unit,
 ) {
 
     val taskBackgroundAnimatable = remember {
         Animatable(
-            Color(if (passedTaskColor != -1) passedTaskColor else viewModel.noteColor.value),
+            Color(
+                if (passedTaskColor != -1) passedTaskColor else ToDoEntry.noteColors.get(0).toArgb()
+            ),
         )
     }
 
@@ -109,7 +112,7 @@ fun AddEditTodo(
                                     .background(color)
                                     .border(
                                         width = 3.dp,
-                                        color = if (viewModel.noteColor.value == colorInt) {
+                                        color = if (viewModel.taskColor.value == colorInt) {
                                             Color.Black
                                         } else {
                                             Color.Transparent
@@ -158,7 +161,8 @@ fun AddEditTodo(
                                     viewModel.editToDo(
                                         toDoEntry = ToDoEntry(
                                             id = id,
-                                            data = textOfPrompt
+                                            data = textOfPrompt,
+                                            color = viewModel.taskColor.value
                                         ), index = whichElement
                                     )
                                     scope.launch {
@@ -169,6 +173,7 @@ fun AddEditTodo(
                                 }
                                 changeWhichElement(-1)
                                 changeTextValue("")
+                                resetColor(-1)
                                 scope.launch {
                                     changePromptSize(AddNewTodoScale.Hidden)
                                     changePromptOffset(AddNewTodoOffset.OffsetRight)

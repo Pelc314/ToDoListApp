@@ -22,8 +22,8 @@ class ToDoListViewModel @Inject constructor(
     private var _toDosState = mutableStateOf(ToDoListState())
     val toDosState: State<ToDoListState> = _toDosState
 
-    private val _noteColor = mutableStateOf<Int>(ToDoEntry.noteColors.get(5).toArgb())
-    val noteColor: State<Int> = _noteColor
+    private val _taskColor = mutableStateOf<Int>(ToDoEntry.noteColors.get(0).toArgb())
+    val taskColor: State<Int> = _taskColor
 
     init {
         getAllToDos()
@@ -54,8 +54,8 @@ class ToDoListViewModel @Inject constructor(
         viewModelScope.launch() {
             val toDos = (_toDosState.value.toDosList) + toDoEntry
             _toDosState.value = _toDosState.value.copy(toDosList = toDos)
-            repository.saveTodo(toDoEntry.copy(color = noteColor.value))
-            _noteColor.value = -1
+            repository.saveTodo(toDoEntry.copy(color = taskColor.value))
+            _taskColor.value = -1
         }
     }
 
@@ -65,8 +65,8 @@ class ToDoListViewModel @Inject constructor(
             _toDosState.value.toDosList[index].data = toDoEntry.data
             _toDosState.value = ToDoListState(toDosList = _toDosState.value.toDosList)
             //stuff above is used just to update screen, below updates the db
-            repository.saveTodo(toDoEntry.copy(color = noteColor.value))
-            _noteColor.value = -1
+            repository.saveTodo(toDoEntry)
+            _taskColor.value = -1
         }
     }
 
@@ -80,6 +80,6 @@ class ToDoListViewModel @Inject constructor(
     }
 
     fun changeColor(colorInt: Int) {
-        _noteColor.value = colorInt
+        _taskColor.value = colorInt
     }
 }

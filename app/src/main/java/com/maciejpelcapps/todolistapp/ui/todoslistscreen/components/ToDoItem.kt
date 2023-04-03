@@ -39,8 +39,7 @@ fun ToDoItem(
     var done by remember {
         mutableStateOf(toDoEntry.done)
     }
-//    val scope = rememberCoroutineScope()
-    var animTime = 1000
+    val animTime = 1000
     var itemLookState by remember { mutableStateOf(ToDoItemLookState.OffsetRight) }
     val transition = updateTransition(targetState = itemLookState)
     val offset by transition.animateOffset(
@@ -78,7 +77,7 @@ fun ToDoItem(
     }
 
     if (taskColor == -1) {
-        color = ToDoEntry.noteColors.get(5).toArgb()
+        color = ToDoEntry.noteColors.get(0).toArgb()
     } else {
         color = taskColor
     }
@@ -101,8 +100,8 @@ fun ToDoItem(
                 onClick = {
                     done = !done
                     viewModel.editToDo(
-                        toDoEntry = toDoEntry,
-                        index = index
+                        toDoEntry = toDoEntry.copy(color = taskColor),
+                        index = index,
                     )
                 })
             if (done) {
