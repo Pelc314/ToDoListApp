@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListViewModel
+import com.maciejpelcapps.todolistapp.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -34,12 +35,11 @@ fun ToDoItem(
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     modifier: Modifier = Modifier,
-    taskColor: Int = -1,
 ) {
     var done by remember {
         mutableStateOf(toDoEntry.done)
     }
-    val animTime = 1000
+    val animTime = Constants.ANIM_TIME
     var itemLookState by remember { mutableStateOf(ToDoItemLookState.OffsetRight) }
     val transition = updateTransition(targetState = itemLookState)
     val offset by transition.animateOffset(
@@ -73,13 +73,13 @@ fun ToDoItem(
     }
 
     var color by rememberSaveable() {
-        mutableStateOf(taskColor)
+        mutableStateOf(toDoEntry.color)
     }
 
-    if (taskColor == -1) {
-        color = ToDoEntry.noteColors.get(0).toArgb()
+    if (toDoEntry.color == -1) {
+        color = ToDoEntry.noteColors[0].toArgb()
     } else {
-        color = taskColor
+        color = toDoEntry.color
     }
 
     Box(
@@ -100,7 +100,7 @@ fun ToDoItem(
                 onClick = {
                     done = !done
                     viewModel.editToDo(
-                        toDoEntry = toDoEntry.copy(color = taskColor),
+                        toDoEntry = toDoEntry.copy(color = toDoEntry.color),
                         index = index,
                     )
                 })

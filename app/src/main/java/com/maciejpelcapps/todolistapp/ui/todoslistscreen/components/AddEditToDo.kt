@@ -26,6 +26,7 @@ import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.AddNewTodoOffset
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.AddNewTodoScale
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListViewModel
+import com.maciejpelcapps.todolistapp.util.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -47,19 +48,18 @@ fun AddEditTodo(
     changePromptOffset: (AddNewTodoOffset) -> Unit,
     changeTextValue: (String) -> Unit,
     modifier: Modifier = Modifier,
-    resetColor: (Int) -> Unit,
 ) {
 
     val taskBackgroundAnimatable = remember {
         Animatable(
             Color(
-                if (passedTaskColor != -1) passedTaskColor else ToDoEntry.noteColors.get(0).toArgb()
+                viewModel.taskColor.value
             ),
         )
     }
 
     LaunchedEffect(scope) {
-        viewModel.changeColor(passedTaskColor)
+
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -80,7 +80,10 @@ fun AddEditTodo(
                         scope.launch {
                             changePromptSize(AddNewTodoScale.Hidden)
                             changePromptOffset(AddNewTodoOffset.OffsetRight)
-                            delay(1000)
+                            delay(Constants.ANIM_TIME.toLong())
+                            changeTextValue("")
+                            changeWhichElement(-1)
+                            viewModel.resetColorToDefault()
                             changeAddingOrEditingTodoBoolean(!addingOrEditingToDo)
                         }
                     }
@@ -94,7 +97,9 @@ fun AddEditTodo(
                             (taskBackgroundAnimatable.value),
                             shape = RoundedCornerShape(16.dp)
                         )
-                        .clickable() { }
+                        .clickable() {
+
+                        }
                 ) {
                     Row(
                         modifier = Modifier
@@ -123,7 +128,7 @@ fun AddEditTodo(
                                         scope.launch {
                                             taskBackgroundAnimatable.animateTo(
                                                 targetValue = Color(colorInt),
-                                                animationSpec = tween(durationMillis = 500),
+                                                animationSpec = tween(durationMillis = Constants.ANIM_TIME),
                                             )
                                         }
                                         viewModel.changeColor(colorInt)
@@ -173,7 +178,7 @@ fun AddEditTodo(
                                 }
                                 changeWhichElement(-1)
                                 changeTextValue("")
-                                resetColor(-1)
+                                viewModel.resetColorToDefault()
                                 scope.launch {
                                     changePromptSize(AddNewTodoScale.Hidden)
                                     changePromptOffset(AddNewTodoOffset.OffsetRight)

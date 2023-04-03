@@ -29,6 +29,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.AddEditTodo
 import com.maciejpelcapps.todolistapp.ui.todoslistscreen.components.ToDoItem
+import com.maciejpelcapps.todolistapp.util.Constants
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -37,7 +40,7 @@ fun ToDoListScreen(
     navController: NavController,
     viewModel: ToDoListViewModel = hiltViewModel(),
 ) {
-    var text by rememberSaveable {
+    var textDataOfTask by rememberSaveable {
         mutableStateOf("")
     }
     var whichElement by rememberSaveable {
@@ -46,7 +49,7 @@ fun ToDoListScreen(
     var id by rememberSaveable {
         mutableStateOf(-1)
     }
-    var taskColor by rememberSaveable {
+    val taskColor by rememberSaveable {
         mutableStateOf(viewModel.taskColor.value)
     }
     var addingOrEditingToDo by rememberSaveable {
@@ -59,7 +62,7 @@ fun ToDoListScreen(
         label = ""
     )
     val addingToDoWindowSizeAnim by addingNewToDoWindowTransition.animateSize(
-        transitionSpec = { tween(1000) },
+        transitionSpec = { tween(Constants.ANIM_TIME) },
         label = ""
     ) { scale ->
         when (scale) {
@@ -76,7 +79,7 @@ fun ToDoListScreen(
     }
     val addEditToDoOffsetTransition = updateTransition(targetState = addEditToDoOffset)
     val addEditTodoOffsetAnim by addEditToDoOffsetTransition.animateOffset(
-        transitionSpec = { tween(1000) },
+        transitionSpec = { tween(Constants.ANIM_TIME) },
         label = ""
     ) { offset ->
         when (offset) {
@@ -113,9 +116,21 @@ fun ToDoListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                addingOrEditingToDo = true
-                addEditToDoSize = AddNewTodoScale.Normal
-                addEditToDoOffset = AddNewTodoOffset.Normal
+                scope.launch {
+                    if (addingOrEditingToDo) {
+                        addEditToDoSize = AddNewTodoScale.Hidden
+                        addEditToDoOffset = AddNewTodoOffset.OffsetRight
+                        delay(Constants.ANIM_TIME.toLong())
+                        addingOrEditingToDo = false
+                        delay(100)
+                    }
+                    addingOrEditingToDo = true
+                    addEditToDoSize = AddNewTodoScale.Normal
+                    addEditToDoOffset = AddNewTodoOffset.Normal
+                    viewModel.resetColorToDefault()
+                    textDataOfTask = ""
+                    whichElement = -1
+                }
             }) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Add FAB")
             }
@@ -124,20 +139,18 @@ fun ToDoListScreen(
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             LazyColumn(modifier = Modifier) {
                 items(toDosListState.toDosList.size) { index ->
-                    taskColor = toDosListState.toDosList[index].color
                     ToDoItem(
                         toDoEntry = toDosListState.toDosList[index],
                         viewModel = viewModel,
                         index = index,
                         scope = scope,
                         scaffoldState = scaffoldState,
-                        taskColor = taskColor,
                         modifier = Modifier.clickable {
                             addingOrEditingToDo = true
-                            text = toDosListState.toDosList[index].data
+                            textDataOfTask = toDosListState.toDosList[index].data
                             id = toDosListState.toDosList[index].id ?: -1
-                            taskColor = toDosListState.toDosList[index].color
                             whichElement = index
+                            viewModel.changeColor(toDosListState.toDosList[index].color)
                             addEditToDoSize = AddNewTodoScale.Normal
                             addEditToDoOffset = AddNewTodoOffset.Normal
                         }
@@ -151,16 +164,15 @@ fun ToDoListScreen(
                 addingOrEditingToDo = addingOrEditingToDo,
                 scope = scope,
                 scaffoldState = scaffoldState,
-                textOfPrompt = text,
+                textOfPrompt = textDataOfTask,
                 viewModel = viewModel,
                 id = id,
                 passedTaskColor = taskColor,
-                resetColor = { taskColor = it },
                 changeAddingOrEditingTodoBoolean = { addingOrEditingToDo = it },
                 changeWhichElement = { whichElement = it },
                 changePromptSize = { addEditToDoSize = it },
                 changePromptOffset = { addEditToDoOffset = it },
-                changeTextValue = { text = it },
+                changeTextValue = { textDataOfTask = it },
                 modifier = Modifier
                     .size(
                         height = addingToDoWindowSizeAnim.height.dp,

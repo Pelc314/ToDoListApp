@@ -22,7 +22,7 @@ class ToDoListViewModel @Inject constructor(
     private var _toDosState = mutableStateOf(ToDoListState())
     val toDosState: State<ToDoListState> = _toDosState
 
-    private val _taskColor = mutableStateOf<Int>(ToDoEntry.noteColors.get(0).toArgb())
+    private val _taskColor = mutableStateOf<Int>(ToDoEntry.noteColors[0].toArgb())
     val taskColor: State<Int> = _taskColor
 
     init {
@@ -55,7 +55,7 @@ class ToDoListViewModel @Inject constructor(
             val toDos = (_toDosState.value.toDosList) + toDoEntry
             _toDosState.value = _toDosState.value.copy(toDosList = toDos)
             repository.saveTodo(toDoEntry.copy(color = taskColor.value))
-            _taskColor.value = -1
+            resetColorToDefault()
         }
     }
 
@@ -66,7 +66,7 @@ class ToDoListViewModel @Inject constructor(
             _toDosState.value = ToDoListState(toDosList = _toDosState.value.toDosList)
             //stuff above is used just to update screen, below updates the db
             repository.saveTodo(toDoEntry)
-            _taskColor.value = -1
+            resetColorToDefault()
         }
     }
 
@@ -75,11 +75,14 @@ class ToDoListViewModel @Inject constructor(
             val toDos = (_toDosState.value.toDosList) - toDoEntry
             repository.deleteTodo(toDoEntry)
             _toDosState.value = ToDoListState(toDos)
-
         }
     }
 
     fun changeColor(colorInt: Int) {
         _taskColor.value = colorInt
+    }
+
+    fun resetColorToDefault() {
+        _taskColor.value = ToDoEntry.noteColors[0].toArgb()
     }
 }
