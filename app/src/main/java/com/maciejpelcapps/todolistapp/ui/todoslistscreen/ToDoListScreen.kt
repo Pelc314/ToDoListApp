@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -121,7 +122,7 @@ fun ToDoListScreen(
             }
         }
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -130,6 +131,7 @@ fun ToDoListScreen(
                 Text(
                     text = "Your tasks",
                     style = MaterialTheme.typography.h4,
+                    fontWeight = FontWeight.Bold
                 )
                 IconButton(onClick = { viewModel.changeSortMenuVisibility() }) {
                     Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
@@ -148,6 +150,7 @@ fun ToDoListScreen(
                     onOrderChange = {
                         Unit
                     },
+                    viewModel = viewModel
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -156,14 +159,14 @@ fun ToDoListScreen(
                     ToDoItem(
                         toDoEntry = toDosListState.toDosList[index],
                         viewModel = viewModel,
-                        index = index,
+                        index = toDosListState.toDosList[index].id!!,
                         scope = scope,
                         scaffoldState = scaffoldState,
                         modifier = Modifier.clickable {
                             addingOrEditingToDo = true
                             textDataOfTask = toDosListState.toDosList[index].data
                             id = toDosListState.toDosList[index].id ?: -1
-                            whichElement = index
+                            whichElement = toDosListState.toDosList[index].id!!
                             viewModel.changeColor(toDosListState.toDosList[index].color)
                             addEditToDoSize = AddNewTodoScale.Normal
                             addEditToDoOffset = AddNewTodoOffset.Normal

@@ -25,6 +25,33 @@ class ToDoListRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getAllTodosAlphabetically(): Flow<Resource<List<ToDoEntry>>> {
+        return flow {
+            emit(Resource.Loading())
+            toDoListDao.getAllTodosSortedByAlphabetically().collect {
+                emit(Resource.Success(it))
+            }
+        }
+    }
+
+    override fun getAllTodosByColor(): Flow<Resource<List<ToDoEntry>>> {
+        return flow {
+            emit(Resource.Loading())
+            toDoListDao.getAllTodosSortedByColor().collect {
+                emit(Resource.Success(it))
+            }
+        }
+    }
+
+    override fun getAllTodosByCompletion(): Flow<Resource<List<ToDoEntry>>> {
+        return flow {
+            emit(Resource.Loading())
+            toDoListDao.getAllTodosSortedByCompletion().collect {
+                emit(Resource.Success(it))
+            }
+        }
+    }
+
     override suspend fun saveTodo(todo: ToDoEntry) {
         toDoListDao.saveTodo(todo)
     }
