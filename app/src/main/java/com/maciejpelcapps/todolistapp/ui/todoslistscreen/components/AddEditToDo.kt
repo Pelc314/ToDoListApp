@@ -34,16 +34,15 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AddEditTodo(
-    whichElement: Int,
+    newTask: Boolean,
+    toDoEntry: ToDoEntry,
     addingOrEditingToDo: Boolean,
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     textOfPrompt: String,
     viewModel: ToDoListViewModel,
-    id: Int,
-    passedTaskColor: Int,
     changeAddingOrEditingTodoBoolean: (Boolean) -> Unit,
-    changeWhichElement: (Int) -> Unit,
+    changeToNewTask: (Boolean) -> Unit,
     changePromptSize: (AddNewTodoScale) -> Unit,
     changePromptOffset: (AddNewTodoOffset) -> Unit,
     changeTextValue: (String) -> Unit,
@@ -82,7 +81,7 @@ fun AddEditTodo(
                             changePromptOffset(AddNewTodoOffset.OffsetRight)
                             delay(Constants.ANIM_TIME.toLong())
                             changeTextValue("")
-                            changeWhichElement(-1)
+                            changeToNewTask(true)
                             viewModel.resetColorToDefault()
                             changeAddingOrEditingTodoBoolean(!addingOrEditingToDo)
                         }
@@ -155,20 +154,22 @@ fun AddEditTodo(
                             .padding(bottom = 8.dp)
                             .align(Alignment.CenterHorizontally), onClick = {
                             if (!textOfPrompt.isBlank()) {
-                                if (whichElement == -1) {
-                                    viewModel.saveToDo(ToDoEntry(data = textOfPrompt))
+                                if (newTask) {
+                                    viewModel.saveToDo(
+                                        ToDoEntry(data = textOfPrompt),
+                                        changeColor = true
+                                    )
                                     scope.launch {
                                         scaffoldState.snackbarHostState.showSnackbar(
                                             message = "Task saved"
                                         )
                                     }
                                 } else {
-                                    viewModel.editToDo(
-                                        toDoEntry = ToDoEntry(
-                                            id = id,
-                                            data = textOfPrompt,
-                                            color = viewModel.taskColor.value
-                                        ), index = whichElement
+                                    viewModel.saveToDo(
+                                        toDoEntry = toDoEntry.copy(
+                                            data = textOfPrompt
+                                        ),
+                                        changeColor = true
                                     )
                                     scope.launch {
                                         scaffoldState.snackbarHostState.showSnackbar(
@@ -176,7 +177,7 @@ fun AddEditTodo(
                                         )
                                     }
                                 }
-                                changeWhichElement(-1)
+                                changeToNewTask(true)
                                 changeTextValue("")
                                 viewModel.resetColorToDefault()
                                 scope.launch {

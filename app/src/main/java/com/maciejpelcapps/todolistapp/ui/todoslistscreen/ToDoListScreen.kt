@@ -42,19 +42,12 @@ fun ToDoListScreen(
     var textDataOfTask by rememberSaveable {
         mutableStateOf("")
     }
-    var whichElement by rememberSaveable {
-        mutableStateOf(-1)
-    }
-    var id by rememberSaveable {
-        mutableStateOf(-1)
-    }
-    val taskColor by rememberSaveable {
-        mutableStateOf(viewModel.taskColor.value)
+    var newTask by rememberSaveable {
+        mutableStateOf(false)
     }
     var addingOrEditingToDo by rememberSaveable {
         mutableStateOf(false)
     }
-
     var addEditToDoSize by remember { mutableStateOf(AddNewTodoScale.Hidden) }
     val addingNewToDoWindowTransition = updateTransition(
         targetState = addEditToDoSize,
@@ -115,7 +108,7 @@ fun ToDoListScreen(
                     addEditToDoOffset = AddNewTodoOffset.Normal
                     viewModel.resetColorToDefault()
                     textDataOfTask = ""
-                    whichElement = -1
+                    newTask = true
                 }
             }) {
                 Icon(imageVector = Icons.Filled.Add, contentDescription = "Add FAB")
@@ -159,15 +152,16 @@ fun ToDoListScreen(
                     ToDoItem(
                         toDoEntry = toDosListState.toDosList[index],
                         viewModel = viewModel,
-                        index = toDosListState.toDosList[index].id!!,
                         scope = scope,
                         scaffoldState = scaffoldState,
                         modifier = Modifier.clickable {
                             addingOrEditingToDo = true
                             textDataOfTask = toDosListState.toDosList[index].data
-                            id = toDosListState.toDosList[index].id ?: -1
-                            whichElement = toDosListState.toDosList[index].id!!
-                            viewModel.changeColor(toDosListState.toDosList[index].color)
+                            newTask = false
+                            viewModel.apply {
+                                changeColor(toDosListState.toDosList[index].color)
+                                setCurrentItem(toDosListState.toDosList[index])
+                            }
                             addEditToDoSize = AddNewTodoScale.Normal
                             addEditToDoOffset = AddNewTodoOffset.Normal
                         }
@@ -177,16 +171,15 @@ fun ToDoListScreen(
         }
         if (addingOrEditingToDo) {
             AddEditTodo(
-                whichElement = whichElement,
+                newTask = newTask,
+                toDoEntry = viewModel.currentItem.value,
                 addingOrEditingToDo = addingOrEditingToDo,
                 scope = scope,
                 scaffoldState = scaffoldState,
                 textOfPrompt = textDataOfTask,
                 viewModel = viewModel,
-                id = id,
-                passedTaskColor = taskColor,
                 changeAddingOrEditingTodoBoolean = { addingOrEditingToDo = it },
-                changeWhichElement = { whichElement = it },
+                changeToNewTask = { newTask = it },
                 changePromptSize = { addEditToDoSize = it },
                 changePromptOffset = { addEditToDoOffset = it },
                 changeTextValue = { textDataOfTask = it },

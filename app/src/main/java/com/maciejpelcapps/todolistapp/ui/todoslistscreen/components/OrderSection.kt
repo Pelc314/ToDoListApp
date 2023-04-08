@@ -34,31 +34,43 @@ fun OrderSection(
                     }
                 },
             )
-            Text(text = "By Color")
+            Text(
+                text = "Color",
+                modifier = Modifier.align(CenterVertically),
+                maxLines = 1
+            )
             RadioButton(
                 selected = listOrder is ToDoListViewModel.TaskListOrder.Alphabetical,
                 modifier = Modifier.align(CenterVertically),
                 onClick = {
-                    if (listOrder is ToDoListViewModel.TaskListOrder.ByColor) {
+                    if (listOrder is ToDoListViewModel.TaskListOrder.Alphabetical) {
                         viewModel.sortEvent(ToDoListViewModel.TaskListOrder.Default())
                     } else {
                         viewModel.sortEvent(ToDoListViewModel.TaskListOrder.Alphabetical())
                     }
                 },
             )
-            Text(text = "Alphabetically")
+            Text(
+                text = "Alphabetically",
+                modifier = Modifier.align(CenterVertically),
+                maxLines = 1
+            )
             RadioButton(
                 selected = listOrder is ToDoListViewModel.TaskListOrder.ByCompletion,
                 modifier = Modifier.align(CenterVertically),
                 onClick = {
-                    if (listOrder is ToDoListViewModel.TaskListOrder.ByColor) {
+                    if (listOrder is ToDoListViewModel.TaskListOrder.ByCompletion) {
                         viewModel.sortEvent(ToDoListViewModel.TaskListOrder.Default())
                     } else {
                         viewModel.sortEvent(ToDoListViewModel.TaskListOrder.ByCompletion())
                     }
                 },
             )
-            Text(text = "By Completion")
+            Text(
+                text = "Completion",
+                modifier = Modifier.align(CenterVertically),
+                maxLines = 1
+            )
         }
     }
 }

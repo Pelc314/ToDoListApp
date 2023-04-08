@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 fun ToDoItem(
     toDoEntry: ToDoEntry,
     viewModel: ToDoListViewModel,
-    index: Int,
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     modifier: Modifier = Modifier,
@@ -64,7 +63,7 @@ fun ToDoItem(
         }
     }
 
-    var customAlpha by rememberSaveable() {
+    val customAlpha by rememberSaveable() {
         mutableStateOf(1f)
     }
 
@@ -99,9 +98,11 @@ fun ToDoItem(
                 modifier = modifier.align(CenterVertically),
                 onClick = {
                     done = !done
-                    viewModel.editToDo(
-                        toDoEntry = toDoEntry.copy(color = toDoEntry.color),
-                        index = index,
+                    viewModel.saveToDo(
+                        toDoEntry = toDoEntry.copy(
+                            done = done
+                        ),
+                        changeColor = false
                     )
                 })
             if (done) {

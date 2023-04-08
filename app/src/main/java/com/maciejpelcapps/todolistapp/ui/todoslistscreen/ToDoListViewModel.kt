@@ -12,6 +12,7 @@ import com.maciejpelcapps.todolistapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,13 +32,18 @@ class ToDoListViewModel @Inject constructor(
     private var _taskListOrder = mutableStateOf<TaskListOrder>(TaskListOrder.Default())
     val taskListOrder: State<TaskListOrder> = _taskListOrder
 
+    private var getDataFromDbJob = viewModelScope.launch {}
+
+    private var _currentItem = mutableStateOf<ToDoEntry>(ToDoEntry(1, ""))
+    val currentItem: State<ToDoEntry> = _currentItem
+
     init {
         sortEvent(taskListOrder.value)
     }
 
-    fun getAllToDos() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getAllTodos().collect() { toDoList ->
+    private fun getAllToDos() {
+        getDataFromDbJob = viewModelScope.launch(Dispatchers.IO) {
+            repository.getAllTodos().cancellable().collect() { toDoList ->
                 delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
@@ -57,12 +63,12 @@ class ToDoListViewModel @Inject constructor(
     }
 
     private fun getAllTodosAlphabetically() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getAllTodosAlphabetically().collect() { toDoList ->
+        getDataFromDbJob = viewModelScope.launch(Dispatchers.IO) {
+            repository.getAllTodosAlphabetically().cancellable().collect() { toDoList ->
                 delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
-                        Log.d("todos success", "${toDoList.data}")
+                        Log.d("todos success alph", "${toDoList.data}")
                         _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
                     }
                     is Resource.Error -> {
@@ -78,12 +84,12 @@ class ToDoListViewModel @Inject constructor(
     }
 
     private fun getAllTodosByColor() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getAllTodosByColor().collect() { toDoList ->
+        getDataFromDbJob = viewModelScope.launch(Dispatchers.IO) {
+            repository.getAllTodosByColor().cancellable().collect() { toDoList ->
                 delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
-                        Log.d("todos success", "${toDoList.data}")
+                        Log.d("todos success color", "${toDoList.data}")
                         _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
                     }
                     is Resource.Error -> {
@@ -99,12 +105,12 @@ class ToDoListViewModel @Inject constructor(
     }
 
     private fun getAllTodosByCompletion() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.getAllTodosByCompletion().collect() { toDoList ->
+        getDataFromDbJob = viewModelScope.launch(Dispatchers.IO) {
+            repository.getAllTodosByCompletion().cancellable().collect() { toDoList ->
                 delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
-                        Log.d("todos success", "${toDoList.data}")
+                        Log.d("todos success completion", "${toDoList.data}")
                         _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
                     }
                     is Resource.Error -> {
@@ -119,39 +125,29 @@ class ToDoListViewModel @Inject constructor(
         }
     }
 
-    fun saveToDo(toDoEntry: ToDoEntry) {
+    fun saveToDo(toDoEntry: ToDoEntry, changeColor: Boolean = true) {
         viewModelScope.launch() {
-            val toDos = (_toDosState.value.toDosList) + toDoEntry
-            _toDosState.value = _toDosState.value.copy(toDosList = toDos)
+            if (!changeColor) changeColor(toDoEntry.color)
             repository.saveTodo(toDoEntry.copy(color = taskColor.value))
-            resetColorToDefault()
-        }
-    }
-
-    fun editToDo(toDoEntry: ToDoEntry, index: Int) {
-        viewModelScope.launch {
-            _toDosState.value.toDosList[index].done = !_toDosState.value.toDosList[index].done
-            _toDosState.value.toDosList[index].data = toDoEntry.data
-            _toDosState.value = ToDoListState(toDosList = _toDosState.value.toDosList)
-            //stuff above is used just to update screen, below updates the db
-            repository.saveTodo(toDoEntry)
             resetColorToDefault()
         }
     }
 
     fun deleteToDo(toDoEntry: ToDoEntry) {
         viewModelScope.launch {
-            val toDos = (_toDosState.value.toDosList) - toDoEntry
             repository.deleteTodo(toDoEntry)
-            _toDosState.value = ToDoListState(toDos)
         }
+    }
+
+    fun setCurrentItem(currentItem: ToDoEntry) { // sets item which is being modified
+        _currentItem.value = currentItem
     }
 
     fun changeColor(colorInt: Int) {
         _taskColor.value = colorInt
     }
 
-    fun resetColorToDefault() {
+    fun resetColorToDefault() { // resets color after editing or creating an item is completed
         _taskColor.value = ToDoEntry.noteColors[0].toArgb()
     }
 
@@ -162,6 +158,7 @@ class ToDoListViewModel @Inject constructor(
 
     // This function invokes corresponding functions to edit task order
     fun sortEvent(listOrder: TaskListOrder) {
+        getDataFromDbJob.cancel() // this cancels the job so we don't receive many different flows from the db only the one which is interesting to us
         when (listOrder) {
             is TaskListOrder.Alphabetical -> {
                 getAllTodosAlphabetically()
