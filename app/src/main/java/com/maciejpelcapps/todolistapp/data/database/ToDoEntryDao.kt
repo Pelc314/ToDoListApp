@@ -24,6 +24,6 @@ interface ToDoEntryDao {
     @Query("SELECT * FROM todos ORDER BY color ASC")
     fun getAllTodosSortedByColor(): Flow<List<ToDoEntry>>
 
-    @Query("SELECT * FROM todos ORDER BY done ASC")
+    @Query("SELECT * FROM todos ORDER BY done DESC")
     fun getAllTodosSortedByCompletion(): Flow<List<ToDoEntry>>
 }

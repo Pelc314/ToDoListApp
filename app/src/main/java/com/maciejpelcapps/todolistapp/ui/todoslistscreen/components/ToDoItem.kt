@@ -35,9 +35,7 @@ fun ToDoItem(
     scaffoldState: ScaffoldState,
     modifier: Modifier = Modifier,
 ) {
-    var done by remember {
-        mutableStateOf(toDoEntry.done)
-    }
+    var done = toDoEntry.done
     val animTime = Constants.ANIM_TIME
     var itemLookState by remember { mutableStateOf(ToDoItemLookState.OffsetRight) }
     val transition = updateTransition(targetState = itemLookState)
