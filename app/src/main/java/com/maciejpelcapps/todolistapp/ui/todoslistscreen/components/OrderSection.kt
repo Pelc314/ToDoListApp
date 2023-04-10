@@ -13,14 +13,11 @@ import com.maciejpelcapps.todolistapp.ui.todoslistscreen.ToDoListViewModel
 
 @Composable
 fun OrderSection(
-    modifier: Modifier = Modifier,
-    taskOrder: Unit,
-    onOrderChange: () -> Unit,
     viewModel: ToDoListViewModel,
 ) {
     val listOrder = viewModel.taskListOrder.value
     Column() {
-        Text(text = "Sort")
+        Text(text = "Sort By")
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             RadioButton(
                 selected = listOrder is ToDoListViewModel.TaskListOrder.ByColor,
@@ -51,7 +48,7 @@ fun OrderSection(
                 },
             )
             Text(
-                text = "Alphabetically",
+                text = "ABC",
                 modifier = Modifier.align(CenterVertically),
                 maxLines = 1
             )
@@ -67,7 +64,7 @@ fun OrderSection(
                 },
             )
             Text(
-                text = "Completion",
+                text = "Done",
                 modifier = Modifier.align(CenterVertically),
                 maxLines = 1
             )

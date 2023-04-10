@@ -95,24 +95,30 @@ fun ToDoListScreen(
     Scaffold(
         scaffoldState = scaffoldState,
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                scope.launch {
-                    if (addingOrEditingToDo) {
-                        addEditToDoSize = AddNewTodoScale.Hidden
-                        addEditToDoOffset = AddNewTodoOffset.OffsetRight
-                        delay(Constants.ANIM_TIME.toLong())
-                        addingOrEditingToDo = false
-                        delay(100)
+            AnimatedVisibility(
+                visible = !addingOrEditingToDo,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { 50 }),
+                exit = fadeOut() + slideOutVertically(targetOffsetY = { 50 }),
+            ) {
+                FloatingActionButton(onClick = {
+                    scope.launch {
+                        if (addingOrEditingToDo) {
+                            addEditToDoSize = AddNewTodoScale.Hidden
+                            addEditToDoOffset = AddNewTodoOffset.OffsetRight
+                            delay(Constants.ANIM_TIME.toLong())
+                            addingOrEditingToDo = false
+                            delay(100)
+                        }
+                        addingOrEditingToDo = true
+                        addEditToDoSize = AddNewTodoScale.Normal
+                        addEditToDoOffset = AddNewTodoOffset.Normal
+                        viewModel.resetColorToDefault()
+                        textDataOfTask = ""
+                        newTask = true
                     }
-                    addingOrEditingToDo = true
-                    addEditToDoSize = AddNewTodoScale.Normal
-                    addEditToDoOffset = AddNewTodoOffset.Normal
-                    viewModel.resetColorToDefault()
-                    textDataOfTask = ""
-                    newTask = true
+                }) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Add FAB")
                 }
-            }) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add FAB")
             }
         }
     ) {
@@ -141,13 +147,6 @@ fun ToDoListScreen(
                 exit = fadeOut() + slideOutVertically(),
             ) {
                 OrderSection(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    taskOrder = Unit,
-                    onOrderChange = {
-                        Unit
-                    },
                     viewModel = viewModel
                 )
             }

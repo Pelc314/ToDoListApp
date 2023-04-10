@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -149,54 +150,79 @@ fun AddEditTodo(
                                 .weight(1f)
                                 .background(Color.White)
                         )
-                        IconButton(modifier = Modifier
-                            .scale(1.7f)
-                            .padding(bottom = 8.dp)
-                            .align(Alignment.CenterHorizontally), onClick = {
-                            if (!textOfPrompt.isBlank()) {
-                                if (newTask) {
-                                    viewModel.saveToDo(
-                                        ToDoEntry(data = textOfPrompt),
-                                        changeColor = true
-                                    )
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        ) {
+                            IconButton(
+                                modifier = Modifier
+                                    .scale(1.5f)
+                                    .padding(bottom = 8.dp),
+                                onClick = {
                                     scope.launch {
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = "Task saved"
+                                        changePromptSize(AddNewTodoScale.Hidden)
+                                        changePromptOffset(AddNewTodoOffset.OffsetRight)
+                                        delay(Constants.ANIM_TIME.toLong())
+                                        changeTextValue("")
+                                        changeToNewTask(true)
+                                        viewModel.resetColorToDefault()
+                                        changeAddingOrEditingTodoBoolean(!addingOrEditingToDo)
+                                    }
+                                }) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = "Go back"
+                                )
+                            }
+                            IconButton(modifier = Modifier
+                                .scale(1.7f)
+                                .padding(bottom = 8.dp), onClick = {
+                                if (textOfPrompt.isNotBlank()) {
+                                    if (newTask) {
+                                        viewModel.saveToDo(
+                                            ToDoEntry(data = textOfPrompt),
+                                            changeColor = true
                                         )
+                                        scope.launch {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = "Task saved"
+                                            )
+                                        }
+                                    } else {
+                                        viewModel.saveToDo(
+                                            toDoEntry = toDoEntry.copy(
+                                                data = textOfPrompt
+                                            ),
+                                            changeColor = true
+                                        )
+                                        scope.launch {
+                                            scaffoldState.snackbarHostState.showSnackbar(
+                                                message = "Task edited"
+                                            )
+                                        }
+                                    }
+                                    changeToNewTask(true)
+                                    changeTextValue("")
+                                    viewModel.resetColorToDefault()
+                                    scope.launch {
+                                        changePromptSize(AddNewTodoScale.Hidden)
+                                        changePromptOffset(AddNewTodoOffset.OffsetRight)
+                                        delay(1000)
+                                        changeAddingOrEditingTodoBoolean(false)
                                     }
                                 } else {
-                                    viewModel.saveToDo(
-                                        toDoEntry = toDoEntry.copy(
-                                            data = textOfPrompt
-                                        ),
-                                        changeColor = true
-                                    )
                                     scope.launch {
-                                        scaffoldState.snackbarHostState.showSnackbar(
-                                            message = "Task edited"
-                                        )
+                                        scaffoldState.snackbarHostState.showSnackbar(message = "Task cannot be empty")
                                     }
                                 }
-                                changeToNewTask(true)
-                                changeTextValue("")
-                                viewModel.resetColorToDefault()
-                                scope.launch {
-                                    changePromptSize(AddNewTodoScale.Hidden)
-                                    changePromptOffset(AddNewTodoOffset.OffsetRight)
-                                    delay(1000)
-                                    changeAddingOrEditingTodoBoolean(false)
-                                }
-                            } else {
-                                scope.launch {
-                                    scaffoldState.snackbarHostState.showSnackbar(message = "Task cannot be empty")
-                                }
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Save,
+                                    contentDescription = "Save button",
+                                )
                             }
-
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Save,
-                                contentDescription = "Save button",
-                            )
                         }
                     }
                 }
