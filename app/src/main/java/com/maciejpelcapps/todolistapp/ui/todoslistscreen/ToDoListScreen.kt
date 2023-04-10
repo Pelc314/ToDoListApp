@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -115,7 +116,11 @@ fun ToDoListScreen(
             }
         }
     ) {
-        Column(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                .fillMaxWidth()
+        ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -147,25 +152,40 @@ fun ToDoListScreen(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(modifier = Modifier) {
-                items(toDosListState.toDosList.size) { index ->
-                    ToDoItem(
-                        toDoEntry = toDosListState.toDosList[index],
-                        viewModel = viewModel,
-                        scope = scope,
-                        scaffoldState = scaffoldState,
-                        modifier = Modifier.clickable {
-                            addingOrEditingToDo = true
-                            textDataOfTask = toDosListState.toDosList[index].data
-                            newTask = false
-                            viewModel.apply {
-                                changeColor(toDosListState.toDosList[index].color)
-                                setCurrentItem(toDosListState.toDosList[index])
-                            }
-                            addEditToDoSize = AddNewTodoScale.Normal
-                            addEditToDoOffset = AddNewTodoOffset.Normal
+            Column() {
+                if (!toDosListState.isLoading) {
+                    LazyColumn(modifier = Modifier) {
+                        items(toDosListState.toDosList.size) { index ->
+                            ToDoItem(
+                                toDoEntry = toDosListState.toDosList[index],
+                                viewModel = viewModel,
+                                scope = scope,
+                                scaffoldState = scaffoldState,
+                                modifier = Modifier.clickable {
+                                    addingOrEditingToDo = true
+                                    textDataOfTask = toDosListState.toDosList[index].data
+                                    newTask = false
+                                    viewModel.apply {
+                                        changeColor(toDosListState.toDosList[index].color)
+                                        setCurrentItem(toDosListState.toDosList[index])
+                                    }
+                                    addEditToDoSize = AddNewTodoScale.Normal
+                                    addEditToDoOffset = AddNewTodoOffset.Normal
+                                }
+                            )
                         }
-                    )
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .align(CenterVertically)
+                                .offset(y = (-40).dp)
+                        )
+                    }
                 }
             }
         }

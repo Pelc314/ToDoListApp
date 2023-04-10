@@ -48,13 +48,16 @@ class ToDoListViewModel @Inject constructor(
                 when (toDoList) {
                     is Resource.Success -> {
                         Log.d("todos success", "${toDoList.data}")
-                        _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
+                        _toDosState.value =
+                            ToDoListState(toDoList.data ?: emptyList(), isLoading = false)
                     }
                     is Resource.Error -> {
                         Log.d("todos error", "${toDoList.message}")
-                        _toDosState.value = ToDoListState(error = toDoList.message ?: "Error")
+                        _toDosState.value =
+                            ToDoListState(error = toDoList.message ?: "Error", isLoading = false)
                     }
                     is Resource.Loading -> {
+                        _toDosState.value = ToDoListState(isLoading = true)
                         Log.d("todos loading", "${toDoList}")
                     }
                 }
@@ -68,14 +71,17 @@ class ToDoListViewModel @Inject constructor(
                 delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
-                        Log.d("todos success alph", "${toDoList.data}")
-                        _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
+                        Log.d("todos success", "${toDoList.data}")
+                        _toDosState.value =
+                            ToDoListState(toDoList.data ?: emptyList(), isLoading = false)
                     }
                     is Resource.Error -> {
                         Log.d("todos error", "${toDoList.message}")
-                        _toDosState.value = ToDoListState(error = toDoList.message ?: "Error")
+                        _toDosState.value =
+                            ToDoListState(error = toDoList.message ?: "Error", isLoading = false)
                     }
                     is Resource.Loading -> {
+                        _toDosState.value = ToDoListState(isLoading = true)
                         Log.d("todos loading", "${toDoList}")
                     }
                 }
@@ -89,14 +95,17 @@ class ToDoListViewModel @Inject constructor(
                 delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
-                        Log.d("todos success color", "${toDoList.data}")
-                        _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
+                        Log.d("todos success", "${toDoList.data}")
+                        _toDosState.value =
+                            ToDoListState(toDoList.data ?: emptyList(), isLoading = false)
                     }
                     is Resource.Error -> {
                         Log.d("todos error", "${toDoList.message}")
-                        _toDosState.value = ToDoListState(error = toDoList.message ?: "Error")
+                        _toDosState.value =
+                            ToDoListState(error = toDoList.message ?: "Error", isLoading = false)
                     }
                     is Resource.Loading -> {
+                        _toDosState.value = ToDoListState(isLoading = true)
                         Log.d("todos loading", "${toDoList}")
                     }
                 }
@@ -110,14 +119,17 @@ class ToDoListViewModel @Inject constructor(
                 delay(500)
                 when (toDoList) {
                     is Resource.Success -> {
-                        Log.d("todos success completion", "${toDoList.data}")
-                        _toDosState.value = ToDoListState(toDoList.data ?: emptyList())
+                        Log.d("todos success", "${toDoList.data}")
+                        _toDosState.value =
+                            ToDoListState(toDoList.data ?: emptyList(), isLoading = false)
                     }
                     is Resource.Error -> {
                         Log.d("todos error", "${toDoList.message}")
-                        _toDosState.value = ToDoListState(error = toDoList.message ?: "Error")
+                        _toDosState.value =
+                            ToDoListState(error = toDoList.message ?: "Error", isLoading = false)
                     }
                     is Resource.Loading -> {
+                        _toDosState.value = ToDoListState(isLoading = true)
                         Log.d("todos loading", "${toDoList}")
                     }
                 }

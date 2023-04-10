@@ -4,5 +4,6 @@ import com.maciejpelcapps.todolistapp.domain.model.ToDoEntry
 
 data class ToDoListState(
     val toDosList: List<ToDoEntry> = emptyList(),
-    val error:String = ""
+    val error: String = "",
+    val isLoading: Boolean = false,
 )
