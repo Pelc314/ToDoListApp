@@ -126,16 +126,16 @@ fun ToDoItem(
             }
             IconButton(modifier = Modifier.align(CenterVertically), onClick = {
                 scope.launch {
+                    viewModel.deleteToDo(toDoEntry)
                     val snackbarResult = scaffoldState.snackbarHostState.showSnackbar(
-                        message = "Task about to be deleted",
+                        message = "Task deleted",
                         duration = SnackbarDuration.Short,
                         actionLabel = "Undo"
                     )
                     when (snackbarResult) {
-                        SnackbarResult.ActionPerformed -> return@launch
+                        SnackbarResult.ActionPerformed -> viewModel.saveToDo(toDoEntry, false)
                         SnackbarResult.Dismissed -> Unit
                     }
-                    viewModel.deleteToDo(toDoEntry)
                 }
             }) {
                 Icon(

@@ -18,7 +18,7 @@ fun OrderSection(
     val listOrder = viewModel.taskListOrder.value
     Column() {
         Text(text = "Sort By")
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
             RadioButton(
                 selected = listOrder is ToDoListViewModel.TaskListOrder.ByColor,
                 modifier = Modifier.align(CenterVertically),
