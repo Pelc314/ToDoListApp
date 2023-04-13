@@ -147,8 +147,12 @@ fun AddEditTodo(
                                 .fillMaxWidth()
                                 .padding(vertical = 16.dp, horizontal = 8.dp)
                                 .align(Alignment.CenterHorizontally)
-                                .weight(1f)
-                                .background(Color.White)
+                                .weight(1f),
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = MaterialTheme.colors.background,
+                                textColor = MaterialTheme.colors.primary
+                            )
+
                         )
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -173,7 +177,8 @@ fun AddEditTodo(
                                 }) {
                                 Icon(
                                     imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = "Go back"
+                                    contentDescription = "Go back",
+                                    tint = Color.Black
                                 )
                             }
                             IconButton(modifier = Modifier
@@ -221,6 +226,7 @@ fun AddEditTodo(
                                 Icon(
                                     imageVector = Icons.Filled.Save,
                                     contentDescription = "Save button",
+                                    tint = Color.Black
                                 )
                             }
                         }

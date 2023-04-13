@@ -29,7 +29,7 @@ class ToDoListViewModel @Inject constructor(
     private val _taskColor = mutableStateOf<Int>(ToDoEntry.noteColors[0].toArgb())
     val taskColor: State<Int> = _taskColor
 
-    private var _taskListOrder = mutableStateOf<TaskListOrder>(TaskListOrder.Default())
+    private var _taskListOrder = mutableStateOf<TaskListOrder>(TaskListOrder.Default)
     val taskListOrder: State<TaskListOrder> = _taskListOrder
 
     private var getDataFromDbJob = viewModelScope.launch {}
@@ -174,28 +174,28 @@ class ToDoListViewModel @Inject constructor(
         when (listOrder) {
             is TaskListOrder.Alphabetical -> {
                 getAllTodosAlphabetically()
-                _taskListOrder.value = TaskListOrder.Alphabetical()
+                _taskListOrder.value = TaskListOrder.Alphabetical
             }
             is TaskListOrder.ByColor -> {
                 getAllTodosByColor()
-                _taskListOrder.value = TaskListOrder.ByColor()
+                _taskListOrder.value = TaskListOrder.ByColor
             }
             is TaskListOrder.ByCompletion -> {
                 getAllTodosByCompletion()
-                _taskListOrder.value = TaskListOrder.ByCompletion()
+                _taskListOrder.value = TaskListOrder.ByCompletion
             }
             is TaskListOrder.Default -> {
                 getAllToDos()
-                _taskListOrder.value = TaskListOrder.Default()
+                _taskListOrder.value = TaskListOrder.Default
             }
         }
     }
 
     sealed class TaskListOrder {
-        class Alphabetical() : TaskListOrder()
-        class ByColor() : TaskListOrder()
-        class ByCompletion() : TaskListOrder()
-        class Default() : TaskListOrder()
+        object Alphabetical : TaskListOrder()
+        object ByColor : TaskListOrder()
+        object ByCompletion : TaskListOrder()
+        object Default : TaskListOrder()
     }
 }
 

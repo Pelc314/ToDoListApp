@@ -15,6 +15,6 @@ data class ToDoEntry(
     var done: Boolean = false,
 ){
     companion object {
-        val noteColors = listOf(lightGreen, RedOrange, Violet, BabyBlue, RedPink)
+        val noteColors = listOf(LightGreen, RedOrange, Violet, BabyBlue, RedPink)
     }
 }

@@ -111,7 +111,8 @@ fun ToDoItem(
                     text = toDoEntry.data,
                     fontWeight = FontWeight.Light,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.Black
                 )
             } else {
                 Text(
@@ -121,7 +122,8 @@ fun ToDoItem(
                     text = toDoEntry.data,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.Black
                 )
             }
             IconButton(modifier = Modifier.align(CenterVertically), onClick = {
@@ -140,7 +142,8 @@ fun ToDoItem(
             }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
-                    contentDescription = "Delete to do"
+                    contentDescription = "Delete to do",
+                    tint = Color.Black
                 )
             }
         }
